@@ -1,0 +1,8 @@
+{
+  "name": "LK Bakehouse",
+  "description": "Artisanal bakery storefront and comprehensive bakery management system for orders, Point of Sale, inventory, and financial reporting.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
