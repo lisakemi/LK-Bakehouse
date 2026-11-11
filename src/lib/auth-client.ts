@@ -15,7 +15,7 @@ export interface StaffProfile {
 
 export const DEFAULT_STAFF_MEMBERS: StaffProfile[] = [
   {
-    id: '10000000-0000-0000-0000-000000000001',
+    id: 'de37bae9-a305-4b06-bcf5-1a6d634a824e',
     email: 'admin@lkbakehouse.co.tz',
     fullName: 'Lilian Kimaro',
     phoneNumber: '+255 712 998 877',
@@ -23,7 +23,7 @@ export const DEFAULT_STAFF_MEMBERS: StaffProfile[] = [
     isActive: true,
   },
   {
-    id: '10000000-0000-0000-0000-000000000002',
+    id: '9bfdebd8-1eeb-48d7-9e66-bb945a97c109',
     email: 'manager@lkbakehouse.co.tz',
     fullName: 'Baraka Mwangi',
     phoneNumber: '+255 768 445 566',
@@ -31,7 +31,7 @@ export const DEFAULT_STAFF_MEMBERS: StaffProfile[] = [
     isActive: true,
   },
   {
-    id: '10000000-0000-0000-0000-000000000003',
+    id: 'b3fd7c72-9b90-4032-a14f-52ba9b3e2cfb',
     email: 'cashier@lkbakehouse.co.tz',
     fullName: 'Amina Juma',
     phoneNumber: '+255 754 112 233',

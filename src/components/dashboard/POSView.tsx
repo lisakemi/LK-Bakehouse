@@ -28,6 +28,7 @@ import {
   ArrowRight,
   HelpCircle,
 } from 'lucide-react';
+import { authFetch, getStaffAuthHeaders } from '../../lib/auth-client.ts';
 
 interface POSItem {
   product: Product;
@@ -136,7 +137,7 @@ export const POSView: React.FC = () => {
       const [pRes, cRes, uRes] = await Promise.all([
         fetch('/api/products?available=true'),
         fetch('/api/categories'),
-        fetch('/api/users', { headers: { 'x-staff-role': 'admin' } }).catch(() => null),
+        fetch('/api/users', { headers: getStaffAuthHeaders() }).catch(() => null),
       ]);
 
       const pData = await pRes.json();
@@ -162,9 +163,7 @@ export const POSView: React.FC = () => {
   const fetchReports = async () => {
     setLoadingReports(true);
     try {
-      const res = await fetch('/api/pos/reports', {
-        headers: { 'x-staff-role': 'admin' },
-      });
+      const res = await authFetch('/api/pos/reports');
       const data = await res.json();
       setReportsData(data);
     } catch (err) {
@@ -180,9 +179,7 @@ export const POSView: React.FC = () => {
       const url = search.trim()
         ? `/api/pos/transactions?search=${encodeURIComponent(search.trim())}`
         : '/api/pos/transactions';
-      const res = await fetch(url, {
-        headers: { 'x-staff-role': 'admin' },
-      });
+      const res = await authFetch(url);
       const data = await res.json();
       setTransactionsList(Array.isArray(data) ? data : []);
     } catch (err) {
@@ -198,9 +195,7 @@ export const POSView: React.FC = () => {
     setCustomerSearchQuery(query);
     setSearchingCustomers(true);
     try {
-      const res = await fetch(`/api/pos/customers/search?q=${encodeURIComponent(query)}`, {
-        headers: { 'x-staff-role': 'cashier' },
-      });
+      const res = await authFetch(`/api/pos/customers/search?q=${encodeURIComponent(query)}`);
       const data = await res.json();
       setCustomerSearchResults(Array.isArray(data) ? data : []);
     } catch (err) {
@@ -232,12 +227,9 @@ export const POSView: React.FC = () => {
     }
 
     try {
-      const res = await fetch('/api/pos/customers', {
+      const res = await authFetch('/api/pos/customers', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-staff-role': 'cashier',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           fullName: newCustName.trim(),
           phoneNumber: newCustPhone.trim(),
@@ -343,11 +335,10 @@ export const POSView: React.FC = () => {
         notes: saleNotes.trim() || undefined,
       };
 
-      const res = await fetch('/api/pos/sale', {
+      const res = await authFetch('/api/pos/sale', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-staff-role': 'cashier',
           'x-idempotency-key': idempotencyKey,
         },
         body: JSON.stringify(payload),
@@ -383,12 +374,9 @@ export const POSView: React.FC = () => {
 
     setIsRefunding(true);
     try {
-      const res = await fetch('/api/pos/refund', {
+      const res = await authFetch('/api/pos/refund', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-staff-role': 'manager',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           orderId: refundTargetOrder.id,
           reason: refundReason.trim(),

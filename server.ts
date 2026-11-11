@@ -255,11 +255,17 @@ app.post('/api/products', optionalAuth, requireRole(['admin', 'manager']), async
     const uniqueSlug = `${baseSlug}-${Date.now().toString().slice(-4)}`;
     const productSku = sku?.trim() || `LKB-PRD-${Date.now().toString().slice(-6)}`;
 
+    let targetCategoryId = categoryId;
+    if (!targetCategoryId) {
+      const defaultCategory = await db.select({ id: productCategories.id }).from(productCategories).limit(1);
+      targetCategoryId = defaultCategory[0]?.id;
+    }
+
     const [newProduct] = await db.insert(products).values({
       name: name.trim(),
       slug: uniqueSlug,
       sku: productSku,
-      categoryId: categoryId || null,
+      categoryId: targetCategoryId,
       basePriceTzs: String(Number(basePriceTzs).toFixed(2)),
       description: description.trim(),
       imageUrl: imageUrl?.trim() || 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=800&q=80',
@@ -922,12 +928,17 @@ app.get('/api/orders/track/:orderNumber', optionalAuth, async (req: AuthRequest,
     if (!isVerified && contactInput) {
       const cleanInputDigits = contactInput.replace(/\D/g, '');
       const cleanOrderPhone = (orderRecord.customerPhone || '').replace(/\D/g, '');
+      const inputWithoutLeadingZero = cleanInputDigits.replace(/^0+/, '');
+      const orderWithoutCountryCode = cleanOrderPhone.replace(/^255/, '').replace(/^0+/, '');
       const inputEmail = contactInput.toLowerCase();
       const orderEmail = (orderRecord.customerEmail || '').toLowerCase();
 
       const phoneMatches =
         cleanInputDigits.length >= 4 &&
-        (cleanOrderPhone.endsWith(cleanInputDigits) || cleanOrderPhone === cleanInputDigits);
+        (cleanOrderPhone.endsWith(cleanInputDigits) ||
+         (inputWithoutLeadingZero.length >= 4 && cleanOrderPhone.endsWith(inputWithoutLeadingZero)) ||
+         (inputWithoutLeadingZero.length >= 4 && orderWithoutCountryCode.endsWith(inputWithoutLeadingZero)) ||
+         cleanOrderPhone === cleanInputDigits);
       const emailMatches = Boolean(orderEmail && inputEmail === orderEmail);
 
       if (phoneMatches || emailMatches) {

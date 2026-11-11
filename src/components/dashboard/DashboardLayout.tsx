@@ -29,7 +29,7 @@ import { SettingsView } from './SettingsView.tsx';
 import { SupportView } from './SupportView.tsx';
 import { ProductsView } from './ProductsView.tsx';
 import { NotificationItem } from '../../types/bakery.ts';
-import { UserCheck, Menu, X, UtensilsCrossed, Shield } from 'lucide-react';
+import { UserCheck, Menu, X, UtensilsCrossed, Shield, Check } from 'lucide-react';
 import { ErrorBoundary } from '../ErrorBoundary.tsx';
 
 import { subscribeToNotifications, subscribeToOrders } from '../../lib/supabase.ts';

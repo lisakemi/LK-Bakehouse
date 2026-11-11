@@ -17,6 +17,7 @@ import {
   Bot,
   AlertTriangle,
 } from 'lucide-react';
+import { authFetch } from '../../lib/auth-client.ts';
 
 export const SupportView: React.FC = () => {
   const [tickets, setTickets] = useState<SupportRequest[]>([]);
@@ -96,7 +97,7 @@ export const SupportView: React.FC = () => {
     setIsSubmittingReply(true);
 
     try {
-      const res = await fetch(`/api/support/requests/${selectedTicketId}/message`, {
+      const res = await authFetch(`/api/support/requests/${selectedTicketId}/message`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -122,7 +123,7 @@ export const SupportView: React.FC = () => {
     if (!selectedTicketId || !selectedTicket) return;
     const nextState = !selectedTicket.isAutomatedRepliesPaused;
     try {
-      const res = await fetch(`/api/support/requests/${selectedTicketId}/toggle-automation`, {
+      const res = await authFetch(`/api/support/requests/${selectedTicketId}/toggle-automation`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ isAutomatedRepliesPaused: nextState }),
@@ -139,7 +140,7 @@ export const SupportView: React.FC = () => {
   const handleResolveTicket = async () => {
     if (!selectedTicketId) return;
     try {
-      const res = await fetch(`/api/support/requests/${selectedTicketId}/resolve`, {
+      const res = await authFetch(`/api/support/requests/${selectedTicketId}/resolve`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

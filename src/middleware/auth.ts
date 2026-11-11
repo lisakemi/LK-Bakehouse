@@ -55,17 +55,30 @@ export const optionalAuth = async (
     // Must match a registered active staff member in PostgreSQL
     if (!req.userRole) {
       const staffSessionId = req.headers['x-staff-session-id'] as string;
-      const staffEmail = req.headers['x-staff-email'] as string;
+      const staffEmail = typeof req.headers['x-staff-email'] === 'string'
+        ? req.headers['x-staff-email'].trim().toLowerCase()
+        : undefined;
 
-      if (staffSessionId || staffEmail) {
-        let condition;
-        if (staffSessionId) {
-          condition = and(eq(userProfiles.id, staffSessionId as any), eq(userProfiles.isActive, true));
-        } else {
-          condition = and(eq(userProfiles.email, staffEmail), eq(userProfiles.isActive, true));
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+      if (staffEmail) {
+        const matchedStaff = await db
+          .select()
+          .from(userProfiles)
+          .where(and(eq(userProfiles.email, staffEmail), eq(userProfiles.isActive, true)))
+          .limit(1);
+
+        if (matchedStaff.length > 0) {
+          req.userRole = matchedStaff[0].role;
+          req.staffUser = matchedStaff[0];
         }
+      } else if (staffSessionId && uuidRegex.test(staffSessionId)) {
+        const matchedStaff = await db
+          .select()
+          .from(userProfiles)
+          .where(and(eq(userProfiles.id, staffSessionId as any), eq(userProfiles.isActive, true)))
+          .limit(1);
 
-        const matchedStaff = await db.select().from(userProfiles).where(condition).limit(1);
         if (matchedStaff.length > 0) {
           req.userRole = matchedStaff[0].role;
           req.staffUser = matchedStaff[0];
